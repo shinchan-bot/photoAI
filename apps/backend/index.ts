@@ -1,12 +1,16 @@
 import express from "express"
-import {TrainModel, GenerateImage, GenerateImagesFromPack} from "common"
-import { prismaClient } from "db";
+import {TrainModel, GenerateImage, GenerateImagesFromPack} from "common/types"
+import { prismaClient } from "db/prisma";
 
-const PORT = process.env.PORT || 8080;
+const PORT = 8080;
 const USER_ID = "123";
 
 const app = express();
 app.use(express.json());
+
+app.get("/", (req, res) => {
+    res.json("Working")
+})
 
 app.post("/ai/training", async(req, res) => {
     const parsedBody = TrainModel.safeParse(req.body);
@@ -87,12 +91,33 @@ app.post("/pack/generate", async(req, res) => {
     })
 })
 
-app.get("/pack/bulk", (req, res) => {
+app.get("/pack/bulk", async (req, res) => {
+
+    const packs = await prismaClient.packs.findMany({});
+
+    res.json({
+        packs
+    })
 
 })
 
-app.get("/image", (req, res) => {
+app.get("/image/bulk", async (req, res) => {
+    const ids = req.query.images as string[]
+    const limit = req.query.limit as string ?? 10;
+    const offset = req.query.offset as string ?? 0;
 
+    const imagesData = await prismaClient.outputImages.findMany({
+        where: {
+            id: {in: ids},
+            userId: USER_ID
+        },
+        skip: parseInt(offset),
+        take: parseInt(limit)
+    })
+
+    res.json({
+        images: imagesData
+    })
 })
 
 app.listen(PORT, () => {

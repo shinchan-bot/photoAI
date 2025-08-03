@@ -15,58 +15,61 @@ datasource db {
 }
 
 model User {
-  id              String    @id   @default(uuid())
-  username        String
-  profilePicture  String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id             String   @id @default(uuid())
+  username       String
+  profilePicture String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+enum ModelTrainingPendingStatus {
+  Pending
+  Generated
+  Failed
 }
 
 model Model {
-  id              String    @id   @default(uuid())
-  name            String
-  type            ModelTypeEnum
-  age             Int
-  ethinicity      EthinicityEnum
-  eyeColor        EyeColorEnum
-  bald            Boolean
-  userId           String
-  trainingImages  TrainingImages[]
-  outputImages    OutputImages[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id             String                     @id @default(uuid())
+  name           String
+  type           ModelTypeEnum
+  age            Int
+  ethinicity     EthinicityEnum
+  eyeColor       EyeColorEnum
+  bald           Boolean
+  userId         String
+  triggerWord    String?
+  tensorPath     String?
+  trainingStatus ModelTrainingPendingStatus @default(Pending)
+  outputImages   OutputImages[]
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  falAiRequestId String?
+  zipUrl         String
 }
-
-model TrainingImages {
-  id          String  @id   @default(uuid())
-  imageUrl    String
-  modelId     String
-  model       Model   @relation(fields: [modelId], references: [id])
-}
-
 model OutputImages {
-  id            String    @id   @default(uuid())
-  imageUrl      String          @default("")
-  modelId       String
-  userId        String
-  prompt        String
-  status        OutputImageStatusEnum   @default(Pending)
-  model         Model     @relation(fields: [modelId], references: [id])
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String                @id @default(uuid())
+  imageUrl       String                @default("")
+  modelId        String
+  userId         String
+  prompt         String
+  status         OutputImageStatusEnum @default(Pending)
+  model          Model                 @relation(fields: [modelId], references: [id])
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  falAiRequestId String?
 }
 
 model Packs {
-  id      String      @id     @default(uuid())
+  id      String        @id @default(uuid())
   name    String
   prompts PackPrompts[]
 }
 
 model PackPrompts {
-  id      String      @id     @default(uuid())
-  prompt  String
-  packId  String
-  pack    Packs   @relation(fields: [packId], references: [id])
+  id     String @id @default(uuid())
+  prompt String
+  packId String
+  pack   Packs  @relation(fields: [packId], references: [id])
 }
 
 enum OutputImageStatusEnum {
@@ -82,12 +85,12 @@ enum ModelTypeEnum {
 }
 
 enum EthinicityEnum {
-  White 
+  White
   Black
-  AsianAmerican   @map("Asian American")
-  EastAsian       @map("East Asian")
-  SouthEastAsian  @map("South East Asian")
-  MiddleEastern   @map("Middle Eastern")
+  AsianAmerican  @map("Asian American")
+  EastAsian      @map("East Asian")
+  SouthEastAsian @map("South East Asian")
+  MiddleEastern  @map("Middle Eastern")
   Pacific
   Hispanic
 }

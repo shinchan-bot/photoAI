@@ -1,5 +1,5 @@
 import express from "express"
-import {TrainModel, GenerateImage, GenerateImagesFromPack} from "common/types"
+import { TrainModel, GenerateImage, GenerateImagesFromPack } from "common/types"
 import { prismaClient } from "db/prisma";
 import { S3Client } from "bun";
 import { FalAIModel } from "./models/FalAIModel";
@@ -21,7 +21,7 @@ app.get("/pre-signed-url", async (req, res) => {
         bucket: process.env.BUCKET_NAME,
         accessKeyId: process.env.S3_ACCESS_KEY_ID,
         secretAccessKey: process.env.S3_SECRET_KEY,
-        expiresIn: 60*5
+        expiresIn: 60 * 5
     })
 
     res.json({
@@ -30,21 +30,21 @@ app.get("/pre-signed-url", async (req, res) => {
     })
 })
 
-app.post("/ai/training", async(req, res) => {
+app.post("/ai/training", async (req, res) => {
     const parsedBody = TrainModel.safeParse(req.body);
     const images = req.body.images;
 
-    if(!parsedBody.success) {
+    if (!parsedBody.success) {
         res.status(411).json({
             message: "Input Incorrect"
         })
-        return 
+        return
     }
 
-    const {request_id, response_url} =  await falAiModel.trainModel(parsedBody.data.zipUrl, parsedBody.data.name);
+    const { request_id, response_url } = await falAiModel.trainModel(parsedBody.data.zipUrl, parsedBody.data.name);
 
     const data = await prismaClient.model.create({
-        data:{
+        data: {
             name: parsedBody.data.name,
             type: parsedBody.data.type,
             age: parsedBody.data.age,
@@ -54,7 +54,7 @@ app.post("/ai/training", async(req, res) => {
             userId: USER_ID,
             zipUrl: parsedBody.data.zipUrl,
             falAiRequestId: request_id
-        } 
+        }
     })
 
     res.json({
@@ -62,23 +62,22 @@ app.post("/ai/training", async(req, res) => {
     })
 })
 
-app.post("/ai/generate", async(req, res) => {
+app.post("/ai/generate", async (req, res) => {
     const parsedBody = GenerateImage.safeParse(req.body);
 
-    if(!parsedBody.success) {
+    if (!parsedBody.success) {
         res.status(411).json({
-            message:"Invalid input"
+            message: "Invalid input"
         })
     }
 
     const model = await prismaClient.model.findUnique({
-        where:{
+        where: {
             id: parsedBody.data?.modelId
         }
     })
-    
-    if(!model || !model.tensorPath)
-    {
+
+    if (!model || !model.tensorPath) {
         res.status(411).json({
             message: "Model not found"
         })
@@ -87,11 +86,11 @@ app.post("/ai/generate", async(req, res) => {
     const request_id = await falAiModel.generateImage(parsedBody.data?.prompt!, model?.tensorPath)
 
     const data = await prismaClient.outputImages.create({
-        data:{
+        data: {
             prompt: parsedBody.data!.prompt!,
             userId: USER_ID,
             modelId: parsedBody.data!.modelId,
-            imageUrl:""
+            imageUrl: ""
         }
     })
 
@@ -100,20 +99,23 @@ app.post("/ai/generate", async(req, res) => {
     })
 })
 
-app.post("/pack/generate", async(req, res) => {
+app.post("/pack/generate", async (req, res) => {
     const parsedBody = GenerateImagesFromPack.safeParse(req.body);
 
-    if(!parsedBody.success) {
+    if (!parsedBody.success) {
         res.status(411).json({
-            message:"Invalid input"
+            message: "Invalid input"
         })
     }
 
     const prompts = await prismaClient.packPrompts.findMany({
-        where:{
+        where: {
             packId: parsedBody.data!.packId
         }
     })
+
+    let requestIds = await Promise.all(prompts.map(async (prompt) => falAiModel.generateImage(prompt.prompt, parsedBody.data?.modelId!)))
+
 
     const images = await prismaClient.outputImages.createManyAndReturn({
         data: prompts.map((prompt) => ({
@@ -125,7 +127,7 @@ app.post("/pack/generate", async(req, res) => {
     })
 
     res.json({
-        images:images.map((image) => image.id)
+        images: images.map((image) => image.id)
     })
 })
 
@@ -146,7 +148,7 @@ app.get("/image/bulk", async (req, res) => {
 
     const imagesData = await prismaClient.outputImages.findMany({
         where: {
-            id: {in: ids},
+            id: { in: ids },
             userId: USER_ID
         },
         skip: parseInt(offset),
@@ -158,13 +160,13 @@ app.get("/image/bulk", async (req, res) => {
     })
 })
 
-app.post("/fai-ai/webhook/train", async (req, res)=> {
+app.post("/fai-ai/webhook/train", async (req, res) => {
     console.log(req.body)
 
     const request_id = req.body.request_id;
 
     await prismaClient.model.updateMany({
-        where:{
+        where: {
             falAiRequestId: request_id
         },
         data: {
@@ -177,7 +179,7 @@ app.post("/fai-ai/webhook/train", async (req, res)=> {
     })
 })
 
-app.post("/fai-ai/webhook/image", async (req, res)=> {
+app.post("/fai-ai/webhook/image", async (req, res) => {
     console.log(req.body)
 
     const requestId = req.body.request_id;

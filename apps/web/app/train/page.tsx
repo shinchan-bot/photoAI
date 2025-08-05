@@ -6,19 +6,23 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+
+} from "@/components/ui/card"   
 import {Button } from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectValue, SelectItem, SelectTrigger } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import {UploadModel} from "@/components/ui/upload";
 
 export default function Train() {
     return (
         <div className="flex flex-col items-center justify-center h-screen">
             <Card className="w-full max-w-sm">
                 <CardHeader>
-                    <CardTitle>Login to your account</CardTitle>
+                    <CardTitle>Create Project</CardTitle>
                     <CardDescription>
-                        Enter your email below to login to your account
+                        Deploy your new project in one-click.
                     </CardDescription>
                     <CardAction>
                         <Button variant="link">Sign Up</Button>
@@ -26,37 +30,81 @@ export default function Train() {
                 </CardHeader>
                 <CardContent>
                     <form>
-                        <div className="flex flex-col gap-6">
-                            <div className="grid gap-2">
+                        <div className="grid w-full items-center gap-4">
+                            <div className="flex flex-col space-y-1.5">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
                                     id="name"
-                                    type="text"
                                     placeholder="Name of the Model"
                                     required
                                 />
                             </div>
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    <a
-                                        href="#"
-                                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                                    >
-                                        Forgot your password?
-                                    </a>
-                                </div>
-                                <Input id="password" type="password" required />
+                            <div className="flex flex-col space-y-1.5">
+                                <Label htmlFor="name">Type</Label>
+                                <Select>
+                                    <SelectTrigger id="name">
+                                        <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent position="popper">
+                                        <SelectItem value="Brown">Man</SelectItem>
+                                        <SelectItem value="Blue">Woman</SelectItem>
+                                        <SelectItem value="Hazel">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex flex-col space-y-1.5">
+                                <Label htmlFor="name">Age</Label>
+                                <Input
+                                    id="name"
+                                    placeholder="Age of the Model"
+                                    required
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-1.5">
+                                <Label htmlFor="name">Ethinicity</Label>
+                                <Select>
+                                    <SelectTrigger className="w-full" id="name">
+                                        <SelectValue placeholder="Select"/>
+                                    </SelectTrigger>
+                                    <SelectContent position="popper">
+                                        <SelectItem value="White">White</SelectItem>
+                                        <SelectItem value="Black">Black</SelectItem>
+                                        <SelectItem value="AsianAmerican">Asian American</SelectItem>
+                                        <SelectItem value="EastAsian">EastAsian</SelectItem>
+                                        <SelectItem value="SouthEastAsian">South East Asian</SelectItem>
+                                        <SelectItem value="SouthAsian">South Asian</SelectItem>
+                                        <SelectItem value="MiddleEastern">Middle Eastern</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex flex-col space-y-1.5">
+                                <Label htmlFor="name">Eye Color</Label>
+                                <Select>
+                                    <SelectTrigger className="w-full" id="name">
+                                        <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent position="popper">
+                                        <SelectItem value="Brown">Brown</SelectItem>
+                                        <SelectItem value="Blue">Blue</SelectItem>
+                                        <SelectItem value="Hazel">Hazel</SelectItem>
+                                        <SelectItem value="Gray">Gray</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex flex-col space-y-1.5">
+                                <Label htmlFor="name">Bald</Label>
+                                <Switch />
                             </div>
                         </div>
                     </form>
                 </CardContent>
+                <UploadModel/>
                 <CardFooter className="flex-col gap-2">
                     <Button type="submit" className="w-full">
-                        Login
+                        Create Model
                     </Button>
                     <Button variant="outline" className="w-full">
-                        Login with Google
+                        Cancel
                     </Button>
                 </CardFooter>
             </Card>

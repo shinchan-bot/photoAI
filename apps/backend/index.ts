@@ -3,6 +3,7 @@ import { TrainModel, GenerateImage, GenerateImagesFromPack } from "common/types"
 import { prismaClient } from "db/prisma";
 import { S3Client } from "bun";
 import { FalAIModel } from "./models/FalAIModel";
+import cors from "cors"
 
 const PORT = 8080;
 const USER_ID = "123";
@@ -10,6 +11,7 @@ const falAiModel = new FalAIModel();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.get("/", (req, res) => {
     res.json("Online")

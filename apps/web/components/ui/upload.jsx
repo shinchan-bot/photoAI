@@ -5,7 +5,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button"
 import axios from "axios";
 import JSZip from 'jszip';
-import {BACKEND_URL} from "../../app/config";
+import { BACKEND_URL } from "../../app/config";
+
 
 export function UploadModel() {
 
@@ -19,20 +20,19 @@ export function UploadModel() {
     const zip = new JSZip();
     const res = await axios.get(`${BACKEND_URL}/pre-signed-url`)
     console.log(res)
-    const presignedUrl = res.data.presignedUrl;
     const url = res.data.url;
-    console.log(url)
-    console.log(files) 
-    // for(const file of files.files)
-    //   const content = await files.arrayBuffer();
-    //   zip.file(files.name, content);
-    // }
-    // const content = await zip.generateAsync({type: "blob"});
-    // const formData = new FormData();
-    // formData.append("file",content);
-    // formData.append("key", url);
-    // const result = await axios. post(presignedUrl, formData);
-    // console.log(result.data);
+    const key = res.data.key;
+    console.log(files)
+    console.log("Presigned url:", url)
+    for (const file of files) {
+      const content = await file.arrayBuffer();
+      zip.file(file.name, content);
+    }
+    const content = await zip.generateAsync({ type: "blob" });
+    const formData = new FormData();
+    formData.append("file", content);
+    const result = await axios.put(url, formData);
+    console.log(result.data);
   }
   return (
     <Card>

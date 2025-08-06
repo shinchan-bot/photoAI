@@ -19,7 +19,7 @@
     "next-env.d.ts",
     "next.config.js",
     ".next/types/**/*.ts"
-  ],
+, "components/upload.jsx"  ],
   "exclude": [
     "node_modules"
   ]

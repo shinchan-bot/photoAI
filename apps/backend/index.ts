@@ -10,6 +10,7 @@ const USER_ID = "123";
 const falAiModel = new FalAIModel();
 
 const app = express();
+
 app.use(express.json());
 app.use(cors());
 
@@ -19,11 +20,14 @@ app.get("/", (req, res) => {
 
 app.get("/pre-signed-url", async (req, res) => {
     const key = `models/${Date.now()}_${Math.random()}.zip`;
-    const url = await S3Client.presign(`models/${Date.now()}_${Math.random()}.zip`, {
+    const url = await S3Client.presign(key, {
+        method:"PUT",
         bucket: process.env.BUCKET_NAME,
         accessKeyId: process.env.S3_ACCESS_KEY_ID,
         secretAccessKey: process.env.S3_SECRET_KEY,
-        expiresIn: 60 * 5
+        endpoint:process.env.ENDPOINT,
+        expiresIn: 60 * 5,
+        type: "application/zip"
     })
 
     res.json({

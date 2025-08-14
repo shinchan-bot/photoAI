@@ -16,8 +16,10 @@
     "@clerk/nextjs": "^6.30.2",
     "@fal-ai/client": "^1.6.1",
     "@types/cors": "^2.8.19",
+    "@types/jsonwebtoken": "^9.0.10",
     "common": "*",
     "cors": "^2.8.5",
-    "db": "*"
+    "db": "*",
+    "jsonwebtoken": "^9.0.2"
   }
 }

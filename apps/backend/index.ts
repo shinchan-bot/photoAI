@@ -4,9 +4,9 @@ import { prismaClient } from "db/prisma";
 import { S3Client } from "bun";
 import { FalAIModel } from "./models/FalAIModel";
 import cors from "cors"
+import { authMiddleware } from "./middleware";
 
 const PORT = 8080;
-const USER_ID = "123";
 const falAiModel = new FalAIModel();
 
 const app = express();
@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
     res.json("Online")
 })
 
-app.get("/pre-signed-url", async (req, res) => {
+app.get("/pre-signed-url", authMiddleware, async (req, res) => {
     const key = `models/${Date.now()}_${Math.random()}.zip`;
     const url = await S3Client.presign(key, {
         method:"PUT",
@@ -36,8 +36,8 @@ app.get("/pre-signed-url", async (req, res) => {
     })
 })
 
-app.post("/ai/training", async (req, res) => {
-    req.body.userId= USER_ID;
+app.post("/ai/training",authMiddleware, async (req, res) => {
+    console.log("user ID: ",req.userId);
     const parsedBody = TrainModel.safeParse(req.body);
     // const parsedBody = req.body;
     const images = req.body.images;
@@ -60,7 +60,7 @@ app.post("/ai/training", async (req, res) => {
             ethnicity: parsedBody.data.ethnicity,
             eyeColor: parsedBody.data.eyeColor,
             bald: parsedBody.data.bald,
-            userId: USER_ID,
+            userId: req.userId!,
             zipUrl: parsedBody.data.zipUrl,
             falAiRequestId: request_id
         }
@@ -71,7 +71,7 @@ app.post("/ai/training", async (req, res) => {
     })
 })
 
-app.post("/ai/generate", async (req, res) => {
+app.post("/ai/generate", authMiddleware, async (req, res) => {
     const parsedBody = GenerateImage.safeParse(req.body);
 
     if (!parsedBody.success) {
@@ -97,7 +97,7 @@ app.post("/ai/generate", async (req, res) => {
     const data = await prismaClient.outputImages.create({
         data: {
             prompt: parsedBody.data!.prompt!,
-            userId: USER_ID,
+            userId: req.userId!,
             modelId: parsedBody.data!.modelId,
             imageUrl: ""
         }
@@ -108,7 +108,7 @@ app.post("/ai/generate", async (req, res) => {
     })
 })
 
-app.post("/pack/generate", async (req, res) => {
+app.post("/pack/generate", authMiddleware, async (req, res) => {
     const parsedBody = GenerateImagesFromPack.safeParse(req.body);
 
     if (!parsedBody.success) {
@@ -129,7 +129,7 @@ app.post("/pack/generate", async (req, res) => {
     const images = await prismaClient.outputImages.createManyAndReturn({
         data: prompts.map((prompt) => ({
             prompt: prompt.prompt,
-            userId: USER_ID,
+            userId: req.userId!,
             modelId: parsedBody.data?.modelId,
             imageUrl: "",
         }))
@@ -150,7 +150,7 @@ app.get("/pack/bulk", async (req, res) => {
 
 })
 
-app.get("/image/bulk", async (req, res) => {
+app.get("/image/bulk", authMiddleware, async (req, res) => {
     const ids = req.query.images as string[]
     const limit = req.query.limit as string ?? 10;
     const offset = req.query.offset as string ?? 0;
@@ -158,7 +158,7 @@ app.get("/image/bulk", async (req, res) => {
     const imagesData = await prismaClient.outputImages.findMany({
         where: {
             id: { in: ids },
-            userId: USER_ID
+            userId: req.userId
         },
         skip: parseInt(offset),
         take: parseInt(limit)

@@ -20,10 +20,13 @@ import {TrainModelInput} from "common/inferred-types"
 import { BACKEND_URL } from "../config";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import {useAuth} from "@clerk/nextjs"
+import { Token } from "@clerk/nextjs/server";
 
 
 
 export default function Train() {
+    const {getToken} = useAuth();
     const [zipUrl, setZipUrl] = useState("");
     const [type, setType] = useState("Man");
     const [age, setAge] = useState<string>();
@@ -45,8 +48,12 @@ export default function Train() {
             zipUrl,
             bald
         }
-
-        const response = await axios.post(`${BACKEND_URL}/ai/training`, input);
+        const token = await getToken();
+        const response = await axios.post(`${BACKEND_URL}/ai/training`, input, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
         router.push("/");
     }
 

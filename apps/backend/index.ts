@@ -37,8 +37,11 @@ app.get("/pre-signed-url", async (req, res) => {
 })
 
 app.post("/ai/training", async (req, res) => {
+    req.body.userId= USER_ID;
     const parsedBody = TrainModel.safeParse(req.body);
+    // const parsedBody = req.body;
     const images = req.body.images;
+    console.log(parsedBody.data)
 
     if (!parsedBody.success) {
         res.status(411).json({
@@ -48,13 +51,13 @@ app.post("/ai/training", async (req, res) => {
     }
 
     const { request_id, response_url } = await falAiModel.trainModel(parsedBody.data.zipUrl, parsedBody.data.name);
-
+    console.log("Zip url: ", parsedBody.data.zipUrl)
     const data = await prismaClient.model.create({
         data: {
             name: parsedBody.data.name,
             type: parsedBody.data.type,
             age: parsedBody.data.age,
-            ethinicity: parsedBody.data.ethinicity,
+            ethnicity: parsedBody.data.ethnicity,
             eyeColor: parsedBody.data.eyeColor,
             bald: parsedBody.data.bald,
             userId: USER_ID,

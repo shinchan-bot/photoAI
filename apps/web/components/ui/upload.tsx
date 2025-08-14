@@ -1,29 +1,32 @@
 "use client"
 
-import { useState } from "react"
+import { ChangeEvent, FormEvent, useState } from "react"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import axios from "axios";
 import JSZip from 'jszip';
 import { BACKEND_URL } from "../../app/config";
 
+interface ChildProps {
+  setZipUrl: React.Dispatch<React.SetStateAction<string>>;
+}
 
-export function UploadModel() {
+export function UploadModel({setZipUrl}: ChildProps) {
 
-  const [files, setFiles] = useState([])
-  const handleFileChange = (e) => {
+  const [files, setFiles] = useState<any[]>([])
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFiles(e.target.files);
   }
-  const handleSubmit = async (e) => {
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     console.log("Uploading file:", files)
     const zip = new JSZip();
     const res = await axios.get(`${BACKEND_URL}/pre-signed-url`)
-    console.log(res)
     const url = res.data.url;
     const key = res.data.key;
-    console.log(files)
     console.log("Presigned url:", url)
+    setZipUrl(url);
     for (const file of files) {
       const content = await file.arrayBuffer();
       zip.file(file.name, content);
@@ -61,7 +64,6 @@ export function UploadModel() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{files.name}</p>
-                <p className="text-sm text-muted-foreground">{(files.size / 1024).toFixed(2)} KB</p>
               </div>
               <Button type="submit">Upload</Button>
             </div>
@@ -72,7 +74,7 @@ export function UploadModel() {
   )
 }
 
-function UploadIcon(props) {
+function UploadIcon(props:any) {
   return (
     <svg
       {...props}

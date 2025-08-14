@@ -1,3 +1,4 @@
+"use client"
 import {
     Card,
     CardAction,
@@ -14,8 +15,41 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectValue, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import {UploadModel} from "@/components/ui/upload";
+import { useState } from "react";
+import {TrainModelInput} from "common/inferred-types"
+import { BACKEND_URL } from "../config";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+
+
 
 export default function Train() {
+    const [zipUrl, setZipUrl] = useState("");
+    const [type, setType] = useState("Man");
+    const [age, setAge] = useState<string>();
+    const [ethnicity, setEthnicity] = useState<string>();
+    const [eyeColor, setEyecolor] = useState<string>();
+    const [bald, setBald] = useState(false);
+    const [name, setName] = useState<string>()
+    const router = useRouter();
+
+
+
+    async function trainModal() {
+        const input = {
+            name,
+            type,
+            age,
+            ethnicity,
+            eyeColor,
+            zipUrl,
+            bald
+        }
+
+        const response = await axios.post(`${BACKEND_URL}/ai/training`, input);
+        router.push("/");
+    }
+
     return (
         <div className="flex flex-col items-center justify-center h-screen">
             <Card className="w-full max-w-sm">
@@ -37,18 +71,21 @@ export default function Train() {
                                     id="name"
                                     placeholder="Name of the Model"
                                     required
+                                    onChange={(e) => {setName(e.target.value)}}
                                 />
                             </div>
                             <div className="flex flex-col space-y-1.5">
                                 <Label htmlFor="name">Type</Label>
-                                <Select>
+                                <Select
+                                    onValueChange={(value) => {setType(value)}}
+                                >
                                     <SelectTrigger id="name">
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent position="popper">
-                                        <SelectItem value="Brown">Man</SelectItem>
-                                        <SelectItem value="Blue">Woman</SelectItem>
-                                        <SelectItem value="Hazel">Other</SelectItem>
+                                        <SelectItem value="Man">Man</SelectItem>
+                                        <SelectItem value="Woman">Woman</SelectItem>
+                                        <SelectItem value="Other">Other</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -58,11 +95,16 @@ export default function Train() {
                                     id="name"
                                     placeholder="Age of the Model"
                                     required
+                                    onChange={(e) => {setAge(e.target.value)}}
+
                                 />
                             </div>
                             <div className="flex flex-col space-y-1.5">
-                                <Label htmlFor="name">Ethinicity</Label>
-                                <Select>
+                                <Label htmlFor="name">Ethnicity</Label>
+                                <Select
+                                    onValueChange={(value) => {setEthnicity(value)}}
+
+                                >
                                     <SelectTrigger className="w-full" id="name">
                                         <SelectValue placeholder="Select"/>
                                     </SelectTrigger>
@@ -79,7 +121,9 @@ export default function Train() {
                             </div>
                             <div className="flex flex-col space-y-1.5">
                                 <Label htmlFor="name">Eye Color</Label>
-                                <Select>
+                                <Select
+                                    onValueChange={(value) => {setEyecolor(value)}}
+                                >
                                     <SelectTrigger className="w-full" id="name">
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
@@ -93,17 +137,28 @@ export default function Train() {
                             </div>
                             <div className="flex flex-col space-y-1.5">
                                 <Label htmlFor="name">Bald</Label>
-                                <Switch />
+                                <Switch onClick={(e) => setBald(!bald)}/>
                             </div>
                         </div>
                     </form>
                 </CardContent>
-                <UploadModel/>
+                <UploadModel setZipUrl = {setZipUrl}/>
                 <CardFooter className="flex-col gap-2">
-                    <Button type="submit" className="w-full">
+                    <Button 
+                        type="submit" 
+                        className="w-full"
+                        onClick={trainModal}
+                        disabled= {!zipUrl || !type || !age || !ethnicity}
+                        >
                         Create Model
                     </Button>
-                    <Button variant="outline" className="w-full">
+                    <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => {
+                            router.push("/")
+                        }}
+                    >
                         Cancel
                     </Button>
                 </CardFooter>

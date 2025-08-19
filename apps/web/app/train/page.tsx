@@ -29,7 +29,7 @@ export default function Train() {
     const {getToken} = useAuth();
     const [zipUrl, setZipUrl] = useState("");
     const [type, setType] = useState("Man");
-    const [age, setAge] = useState<string>();
+    const [age, setAge] = useState<number>(0);
     const [ethnicity, setEthnicity] = useState<string>();
     const [eyeColor, setEyecolor] = useState<string>();
     const [bald, setBald] = useState(false);
@@ -51,7 +51,8 @@ export default function Train() {
         const token = await getToken();
         const response = await axios.post(`${BACKEND_URL}/ai/training`, input, {
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${token}`,
+                ContentLength: ""
             }
         });
         router.push("/");
@@ -102,7 +103,7 @@ export default function Train() {
                                     id="name"
                                     placeholder="Age of the Model"
                                     required
-                                    onChange={(e) => {setAge(e.target.value)}}
+                                    onChange={(e) => {setAge(Number(e.target.value))}}
 
                                 />
                             </div>
@@ -123,6 +124,9 @@ export default function Train() {
                                         <SelectItem value="SouthEastAsian">South East Asian</SelectItem>
                                         <SelectItem value="SouthAsian">South Asian</SelectItem>
                                         <SelectItem value="MiddleEastern">Middle Eastern</SelectItem>
+                                        <SelectItem value="Pacific">Pacific</SelectItem>
+                                        <SelectItem value="Hispanic">Hispanic</SelectItem>
+
                                     </SelectContent>
                                 </Select>
                             </div>

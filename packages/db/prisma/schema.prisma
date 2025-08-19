@@ -90,6 +90,7 @@ enum EthnicityEnum {
   AsianAmerican  @map("Asian American")
   EastAsian      @map("East Asian")
   SouthEastAsian @map("South East Asian")
+  SouthAsian
   MiddleEastern  @map("Middle Eastern")
   Pacific
   Hispanic

@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
     res.json("Online")
 })
 
-app.get("/pre-signed-url", authMiddleware, async (req, res) => {
+app.get("/pre-signed-url", async (req, res) => {
     const key = `models/${Date.now()}_${Math.random()}.zip`;
     const url = await S3Client.presign(key, {
         method:"PUT",
@@ -38,12 +38,12 @@ app.get("/pre-signed-url", authMiddleware, async (req, res) => {
 
 app.post("/ai/training",authMiddleware, async (req, res) => {
     console.log("user ID: ",req.userId);
+    req.body.userId = req.userId;
     const parsedBody = TrainModel.safeParse(req.body);
-    // const parsedBody = req.body;
     const images = req.body.images;
-    console.log(parsedBody.data)
 
     if (!parsedBody.success) {
+        console.log(parsedBody.error)
         res.status(411).json({
             message: "Input Incorrect"
         })

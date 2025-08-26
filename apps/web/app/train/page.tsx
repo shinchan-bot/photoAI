@@ -59,7 +59,7 @@ export default function Train() {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen">
+        <div className="flex flex-col items-center justify-center h-vh">
             <Card className="w-full max-w-sm">
                 <CardHeader>
                     <CardTitle>Create Project</CardTitle>

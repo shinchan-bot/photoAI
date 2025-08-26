@@ -33,7 +33,7 @@ model Model {
   name           String
   type           ModelTypeEnum
   age            Int
-  ethnicity     EthnicityEnum
+  ethnicity      EthnicityEnum
   eyeColor       EyeColorEnum
   bald           Boolean
   userId         String
@@ -46,6 +46,7 @@ model Model {
   falAiRequestId String?
   zipUrl         String
 }
+
 model OutputImages {
   id             String                @id @default(uuid())
   imageUrl       String                @default("")
@@ -90,7 +91,7 @@ enum EthnicityEnum {
   AsianAmerican  @map("Asian American")
   EastAsian      @map("East Asian")
   SouthEastAsian @map("South East Asian")
-  SouthAsian
+  SouthAsian     @map("South Asian")
   MiddleEastern  @map("Middle Eastern")
   Pacific
   Hispanic

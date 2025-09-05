@@ -21,7 +21,6 @@ export function Appbar() {
             </SignedOut>
             <SignedIn>
                 <UserButton />
-
             </SignedIn>
         </div>
     </div>

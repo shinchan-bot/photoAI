@@ -61,9 +61,12 @@ model OutputImages {
 }
 
 model Packs {
-  id      String        @id @default(uuid())
-  name    String
-  prompts PackPrompts[]
+  id          String        @id @default(uuid())
+  name        String        @default("")
+  description String        @default("")
+  imageUrl1    String
+  imageUrl2    String
+  prompts     PackPrompts[]
 }
 
 model PackPrompts {
